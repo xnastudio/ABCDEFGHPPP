@@ -1,0 +1,30 @@
+(DEFUN FIND-AUX (N ANSWER) ; find the nth digi of answer
+  (COND ((= N 9)(PRINT ANSWER))
+        (T (FIND-SUB N 0 ANSWER))))
+(DEFUN FIND-SUB (N M ANSWER) ;try to append nth digi as m to answer list
+  (COND ((= M 10)'END)
+        ((AND (= M 0) (EVENP N))(FIND-SUB N (+ M 1) ANSWER)) ;A C E G P <>0
+        (T (COND ((MEMBER M ANSWER)) ; each digi only appears once in answer
+                 ((NOT (PASS-RULE1P (APPEND ANSWER (LIST M)))))
+                 ((NOT (PASS-RULE2P (APPEND ANSWER (LIST M)))))
+                 (T (FIND-AUX (+ N 1) (APPEND ANSWER (LIST M)))))
+           (FIND-SUB N (+ M 1) ANSWER))))
+(DEFUN FIND-ANSWER () (FIND-AUX 0 NIL)) ;find answer list (A B C D E F G H P)
+(DEFUN PASS-RULE1P (ANSWER) ;pass-rule1 : AB - CD = EF
+  (COND ((>= (LENGTH ANSWER) 6)
+         (= (- (+ (* (NTH 0 ANSWER) 10)
+                  (NTH 1 ANSWER))
+               (+ (* (NTH 2 ANSWER) 10)
+                  (NTH 3 ANSWER)))
+            (+ (* (NTH 4 ANSWER) 10)
+               (NTH 5 ANSWER))))
+        (T T)))
+(DEFUN PASS-RULE2P (ANSWER) ;pass-rule2 : EF + GH = PPP
+  (COND ((>= (LENGTH ANSWER) 9)
+         (= (+ (+ (* (NTH 4 ANSWER) 10)
+                  (NTH 5 ANSWER))
+               (+ (* (NTH 6 ANSWER) 10)
+                  (NTH 7 ANSWER)))
+            (LET ((P (NTH 8 ANSWER)))
+                 (+ (* P 100) (* P 10) P))))
+        (T T)))
